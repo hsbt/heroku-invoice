@@ -8,5 +8,9 @@ publish invoice on your heroku account.
 
 ## Usage
 
+    # publish current invoice.
     $ heroku invoice --app myapp
+    # publish 2012/3 invoice.
+    $ heroku invoice 201203 -app myapp
+    # publish pdf (use wkhtmltopdf)
     $ heroku invoice:pdf --app myapp
