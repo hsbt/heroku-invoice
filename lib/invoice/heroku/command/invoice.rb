@@ -1,27 +1,25 @@
 class Heroku::Command::Invoice < Heroku::Command::Base
   def index
-    write_body(filename)
+    write_body
   end
 
   def pdf
-    require 'tempfile'
-
-    t = Tempfile.new
-    write_body(t.path)
-    system "wkhtmltopdf #{t.path} #{filename.sub(/\.html\z/, '.pdf')}"
-    t.flush
+    require 'fileutils'
+    write_body
+    system "wkhtmltopdf #{filename} #{filename.sub(/\.html\z/, '.pdf')}"
+    FileUtils.rm filename
   end
 
 private
 
-  def write_body(name)
+  def write_body
     Zlib::GzipReader.wrap(StringIO.new(get_body)) do |gz|
-      File.open(name, 'w'){|f| f.print gz.read}
+      File.open(filename, 'w'){|f| f.print gz.read}
     end
   end
 
   def get_body
-    heroku.get_invoice(optparse).net_http_res.body
+    heroku.get_invoice(*optparse).net_http_res.body
   end
 
   def filename
