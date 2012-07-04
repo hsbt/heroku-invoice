@@ -1,3 +1,5 @@
+require 'json'
+
 class Heroku::Command::Invoice < Heroku::Command::Base
   def index
     write_body
@@ -13,13 +15,12 @@ class Heroku::Command::Invoice < Heroku::Command::Base
 private
 
   def write_body
-    Zlib::GzipReader.wrap(StringIO.new(get_body)) do |gz|
-      File.open(filename, 'w'){|f| f.print gz.read}
-    end
+    body = get_body
+    File.open(filename, 'w'){|f| f.print body }
   end
 
   def get_body
-    heroku.get_invoice(*optparse).net_http_res.body
+    JSON.parse(heroku.get_invoice(*optparse))['attrs']['html']
   end
 
   def filename
